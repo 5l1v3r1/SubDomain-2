@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #-Metadata----------------------------------------------------#
-#  Filename: sub.sh (v1.0.21)   (Update: 2020-05-05)          #
+#  Filename: sub.sh (v1.0.0)   (Update: 2020-07-27)           #
 #-Info--------------------------------------------------------#
 # Subdomain Detect Script			     	     			  #
 #-URL---------------------------------------------------------#
-# https://git.io/JesKK                                        #
+# https://git.io/-----                                        #
 #-------------------------------------------------------------#
 
 GREEN="\033[1;32m"
@@ -13,12 +13,14 @@ BLUE="\033[1;36m"
 RED="\033[1;31m"
 RESET="\033[0m"
 
+
+
 function banner(){
 	echo -e "${BLUE}[i] Subdomain Detect Script ${RESET}"
-	echo -e "[t] Twitter => https://twitter.com/cihanmehmets"
-	echo -e "[g] Github => https://github.com/cihanmehme/sub.sh"
-	echo -e "${BLUE}[#] bash sub.sh -s webscantest.com ${RESET}"
-	echo -e "${BLUE}[#] curl -sL https://git.io/JesKK | bash /dev/stdin -a webscantest.com ${RESET}"
+	echo -e "[t] Twitter => https://twitter.com/r0cky57347427"
+	echo -e "[g] Github => https://github.com/r0ckysec/sub.sh"
+	echo -e "${BLUE}[#] bash sub.sh -s domain ${RESET}"
+	echo -e "${BLUE}[#] curl -sL https://git.io/----- | bash /dev/stdin -a domain ${RESET}"
 	echo -e "█████████████████████████████████████████████████████████████████"
 }
 #############################################################################################################
@@ -96,7 +98,7 @@ function 15findomain() {
 	echo "[+] Findomain Over => $(wc -l findomain_$1.txt | awk '{ print $1}')"
 }
 function 16subfinder() {
-	subfinder -silent -d $1 -o subfinder_$1.txt &>/dev/null
+	subfinder -config subtools/config/config.yaml -silent -d $1 -o subfinder_$1.txt &>/dev/null
 	echo "[+] Subfinder Over => $(wc -l subfinder_$1.txt|awk '{ print $1}')"
 }
 function 17amass_passive() {
@@ -118,12 +120,42 @@ function 19rapiddns() {
 }
 function 20subDomainsBrute() {
 	path=`pwd`
-	cd /root/hacktool/subDomainsBrute/
+	cd subtools/subDomainsBrute/
 	python subDomainsBrute.py --full $1 -o tmp_$1.txt &>/dev/null
 	cat tmp_$1.txt | awk '{ print $1}' > subDomainsBrute_$1.txt
 	rm -rf tmp_$1.txt
 	cp subDomainsBrute_$1.txt ${path}/
 	echo "[+] subDomainsBrute Over => $(wc -l subDomainsBrute_$1.txt|awk '{ print $1}')"
+}
+function 21Sublist3r() {
+	path=`pwd`
+	cd subtools/Sublist3r/
+	python3 sublist3r.py -t 100 -o sublist3r_$1.txt -d $1 &>/dev/null
+	cp sublist3r_$1.txt ${path}/
+	echo "[+] Sublist3r Over => $(wc -l sublist3r_$1.txt|awk '{ print $1}')"
+}
+function 22knock() {
+	path=`pwd`
+	cd subtools/knock-4.1/
+	# 清除之前的记录
+	rm -rf *.json
+	python knockpy/knockpy.py -j $1 &>/dev/null
+	cat *.json | jq -r .found.subdomain[] > knock_$1.txt
+	cp knock_$1.txt ${path}/
+	echo "[+] knock Over => $(wc -l knock_$1.txt|awk '{ print $1}')"
+}
+function 23shuffledns() {
+	shuffledns -massdns massdns/bin/massdns -d $1 -w dict/subnames.txt -r dict/resolvers.txt -silent -o shuffledns_$1.txt &>/dev/null
+	echo "[+] shuffledns Over => $(wc -l shuffledns_$1.txt|awk '{ print $1}')"
+}
+function 24theHarvester() {
+	path=`pwd`
+	cd subtools/theHarvester/
+	python3 theHarvester.py -d $1 -c -b all -f tmp_domain &>/dev/null
+	echo '</theHarvester>' >> tmp_domain.xml
+	xmllint --xpath "//hostname/text()" tmp_domain.xml > theHarvester_$1.txt
+	cp theHarvester_$1.txt ${path}/
+	echo "[+] theHarvester Over => $(wc -l theHarvester_$1.txt|awk '{ print $1}')"
 }
 #############################################################################################################
 function commonToolInstall(){
@@ -135,7 +167,7 @@ function commonToolInstall(){
 	export GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 
 	if [ -e ~/go/bin/httprobe ] || [ -e /usr/local/bin/httprobe ] || [ -e ~/go-workspace/bin/httprobe ] || [ -e ~/gopath/bin/httprobe ] ; then
-		echo -e "${BLUE}[!] httprobe already exists${RESET}"
+		echo -e "${BLUE}[!] httprobe already exists ${RESET}"
 	else 
 		go get -u github.com/tomnomnom/httprobe
 		sudo mv ~/go/bin/httprobe /usr/local/bin/httprobe
@@ -145,31 +177,31 @@ function commonToolInstall(){
 		#tar -zxf /tmp/httprobe-linux-amd64-0.1.2.tgz -C /usr/local/bin/
 		#sudo chmod +x /usr/local/bin/httprobe
 		#rm -rf /tmp/httprobe-linux-amd64-0.1.2.tgz
-		echo -e "${GREEN}[!] httprobe installed${RESET}"
+		echo -e "${GREEN}[!] httprobe installed ${RESET}"
 	fi
 
 	if [ -e ~/go/bin/subfinder ] || [ -e /usr/local/bin/subfinder ] || [ -e ~/go-workspace/bin/subfinder ] || [ -e ~/gopath/bin/subfinder ] ; then
-		echo -e "${BLUE}[!] Subfinder already exists${RESET}"
+		echo -e "${BLUE}[!] Subfinder already exists ${RESET}"
 	else 
 		go get -u -v github.com/projectdiscovery/subfinder/cmd/subfinder
 		sudo mv ~/go/bin/subfinder /usr/local/bin/subfinder
 		sudo chmod +x /usr/local/bin/subfinder
-		echo -e "${GREEN}[!] Subfinder installed${RESET}"
+		echo -e "${GREEN}[!] Subfinder installed ${RESET}"
 	fi
 
 	if [ -e ~/go/bin/assetfinder ] || [ -e /usr/local/bin/assetfinder ] || [ -e ~/go-workspace/bin/assetfinder ] || [ -e ~/gopath/bin/assetfinder ] ; then
-		echo -e "${BLUE}[!] Assetfinder already exists${RESET}"
+		echo -e "${BLUE}[!] Assetfinder already exists ${RESET}"
 	   
 	else 
 		go get -u github.com/tomnomnom/assetfinder
 		sudo mv ~/go/bin/assetfinder /usr/local/bin/assetfinder
 		sudo chmod +x /usr/local/bin/assetfinder
-		echo -e "${GREEN}[!] Assetfinder installed${RESET}"
+		echo -e "${GREEN}[!] Assetfinder installed ${RESET}"
 	fi
 
 	if [ -e /usr/local/bin/findomain ] ; then
 	   
-	   echo -e "${BLUE}[!] Findomain already exists${RESET}"
+		echo -e "${BLUE}[!] Findomain already exists ${RESET}"
 	   
 	else 
 		case "$(uname -a)" in
@@ -177,7 +209,7 @@ function commonToolInstall(){
 			 	wget https://github.com/Edu4rdSHL/findomain/releases/latest/download/findomain-linux
 				sudo chmod +x findomain-linux
 				sudo mv findomain-linux /usr/local/bin/findomain
-				echo -e "${GREEN}[!] Findomain installed${RESET}"
+				echo -e "${GREEN}[!] Findomain installed ${RESET}"
 				;;
 			*)
 				echo "OS Not Linux";
@@ -188,18 +220,18 @@ function commonToolInstall(){
 
 	if [ -e /usr/bin/amass ] || [ -e /usr/local/bin/amass ] || [ -e ~/go/bin/amass ] ||  [ -e ~/go-workspace/bin/amass ] || [ -e ~/gopath/bin/amass ] ; then
 	   
-	   echo -e "${BLUE}[!] Amass already exists${RESET}"
+		echo -e "${BLUE}[!] Amass already exists ${RESET}"
 	   
 	else 
 		case "$(uname -a)" in
-			*Fedora*)
+			*Debian*|*Ubuntu*|*Linux*|*Fedora*)
 				
 				wget https://github.com/OWASP/Amass/releases/latest/download/amass_linux_amd64.zip -O /tmp/amass.zip
 				unzip /tmp/amass.zip -d /tmp/
 				sudo mv /tmp/amass_linux_amd64/amass /usr/local/bin/amass
 				sudo chmod +x /usr/local/bin/amass
 				rm -rf /tmp/amass_linux_amd64/ amass.zip
-				echo -e "${GREEN}[!] Amass installed${RESET}"
+				echo -e "${GREEN}[!] Amass installed ${RESET}"
 				#git clone https://github.com/OWASP/Amass.git
 				#go get -v -u github.com/OWASP/Amass/v3/...
 				;;
@@ -207,46 +239,100 @@ function commonToolInstall(){
 				echo "OS Not Fedora";
 				;;
 		esac
-
+	fi
+	# --------
+	# Install shuffledns
+	if [ -e /usr/bin/shuffledns ] || [ -e /usr/local/bin/shuffledns ] || [ -e ~/go/bin/shuffledns ] ||  [ -e ~/go-workspace/bin/shuffledns ] || [ -e ~/gopath/bin/shuffledns ] ; then
+	   
+		echo -e "${BLUE}[!] Shuffledns already exists ${RESET}"
+	   
+	else 
+		go get -u -v github.com/projectdiscovery/shuffledns/cmd/shuffledns
+		# wget https://github.com/projectdiscovery/shuffledns/releases/latest/download/shuffledns_1.0.4_linux_amd64.tar.gz
+		# tar -xzvf shuffledns_1.0.4_linux_amd64.tar.gz -O /tmp/
+		sudo mv ~/go/bin/shuffledns /usr/local/bin/shuffledns
+		sudo chmod +x /usr/local/bin/shuffledns
+		echo -e "${GREEN}[!] Shuffledns installed ${RESET}"
+	fi
+	
+	# Install massdns
+	if [ -e massdns/bin/massdns ] ; then
+		echo -e "${BLUE}[!] Massdns already exists ${RESET}"
+	else 
+		git clone https://github.com/blechschmidt/massdns.git
+		cd massdns/
+		make
+		cd ..
+		echo -e "${GREEN}[!] Massdns installed ${RESET}"
+	fi
+	
+	# Install subtools
+	if [ -d subtools ] ; then
+		echo -e "${BLUE}[!] Subtools already exists ${RESET}"
+	else 
+		git clone https://github.com/r0ckysec/subtools.git
+		echo -e "${GREEN}[!] Subtools installed ${RESET}"
 	fi
 	
 	# 再次检验
 	if [ -e ~/go/bin/httprobe ] || [ -e /usr/local/bin/httprobe ] || [ -e ~/go-workspace/bin/httprobe ] || [ -e ~/gopath/bin/httprobe ] ; then
-		echo -e "${GREEN}[True] httprobe already exists${RESET}"
+		echo -e "[${GREEN}True${RESET}] httprobe already exists"
 	else
-		echo -e "${REA}[!] httprobe not exists${RESET}"
-		exit 0
+		echo -e "${RED}[!] httprobe not exists ${RESET}"
+		exit -1
 	fi
 
 	if [ -e ~/go/bin/subfinder ] || [ -e /usr/local/bin/subfinder ] || [ -e ~/go-workspace/bin/subfinder ] || [ -e ~/gopath/bin/subfinder ] ; then
-		echo -e "${GREEN}[True] Subfinder already exists${RESET}"
+		echo -e "[${GREEN}True${RESET}] Subfinder already exists"
 	else
-		echo -e "${REA}[!] Subfinder not exists${RESET}"
-		exit 0
+		echo -e "${RED}[!] Subfinder not exists ${RESET}"
+		exit -1
 	fi
 
 	if [ -e ~/go/bin/assetfinder ] || [ -e /usr/local/bin/assetfinder ] || [ -e ~/go-workspace/bin/assetfinder ] || [ -e ~/gopath/bin/assetfinder ] ; then
-		echo -e "${GREEN}[True] Assetfinder already exists${RESET}"
+		echo -e "[${GREEN}True${RESET}] Assetfinder already exists"
 	else
-		echo -e "${REA}[!] Assetfinder not exists${RESET}"
-		exit 0
+		echo -e "${RED}[!] Assetfinder not exists ${RESET}"
+		exit -1
 	fi
 
 	if [ -e /usr/local/bin/findomain ] ; then
-		echo -e "${GREEN}[True] Findomain already exists${RESET}"
+		echo -e "[${GREEN}True${RESET}] Findomain already exists"
 	   
 	else
-		echo -e "${REA}[!] Findomain not exists${RESET}"
-		exit 0
+		echo -e "${RED}[!] Findomain not exists ${RESET}"
+		exit -1
 	fi
 
 	if [ -e /usr/bin/amass ] || [ -e /usr/local/bin/amass ] || [ -e ~/go/bin/amass ] ||  [ -e ~/go-workspace/bin/amass ] || [ -e ~/gopath/bin/amass ] ; then
 	   
-		echo -e "${GREEN}[True] Amass already exists${RESET}"
+		echo -e "[${GREEN}True${RESET}] Amass already exists"
 	   
 	else
-		echo -e "${REA}[!] Amass not exists${RESET}"
-		exit 0
+		echo -e "${RED}[!] Amass not exists ${RESET}"
+		exit -1
+	fi
+	
+	if [ -e /usr/bin/shuffledns ] || [ -e /usr/local/bin/shuffledns ] || [ -e ~/go/bin/shuffledns ] ||  [ -e ~/go-workspace/bin/shuffledns ] || [ -e ~/gopath/bin/shuffledns ] ; then
+	   
+		echo -e "[${GREEN}True${RESET}] Shuffledns already exists"
+	   
+	else
+		echo -e "${RED}[!] Shuffledns not exists ${RESET}"
+		exit -1
+	fi
+	
+	if [ -e massdns/bin/massdns ] ; then
+		echo -e "[${GREEN}True${RESET}] Massdns already exists"
+	else
+		echo -e "${RED}[!] Massdns not exists ${RESET}"
+		exit -1
+	fi
+	if [ -d subtools ] ; then
+		echo -e "[${GREEN}True${RESET}] Subtools already exists"
+	else 
+		echo -e "${RED}[!] Massdns not exists ${RESET}"
+		exit -1
 	fi
 
 }
@@ -258,9 +344,10 @@ function installDebian(){ #Kali and Parrot Os
 	sudo apt install amass -y;
 	sudo apt install parallel -y;
 	sudo apt install golang-go -y;
-	echo -e "${GREEN}[!] Debian Tool Installed${RESET}"
+	sudo apt install git -y;
+	echo -e "${GREEN}[!] Debian Tool Installed ${RESET}"
 	commonToolInstall;
-	echo -e "${GREEN}[!] Common Tool Installed${RESET}"
+	echo -e "${GREEN}[!] Common Tool Installed ${RESET}"
 	source ~/.bashrc ~/.zshrc;
 }
 function installOSX(){
@@ -271,7 +358,8 @@ function installOSX(){
 	brew install amass
 	brew install parallel
 	brew install go
-	echo -e "${GREEN}[!] MAC-OSX Tool Installed${RESET}"
+	brew install git
+	echo -e "${GREEN}[!] MAC-OSX Tool Installed ${RESET}"
 	commonToolInstall
 	brew cleanup
 	source ~/.bashrc ~/.zshrc;
@@ -281,7 +369,8 @@ function installFedora(){
 	sudo yum install jq -y;
 	sudo yum install parallel -y;
 	sudo yum install golang -y;
-	echo -e "${GREEN}[!] Fedora Tool Installed${RESET}"
+	sudo yum install git -y;
+	echo -e "${GREEN}[!] Fedora Tool Installed ${RESET}"
 	commonToolInstall
 
 	source ~/.bashrc ~/.zshrc;
@@ -338,16 +427,19 @@ args="${1}";
 
 		-a|--all)
 			banner
-			export -f 1crt && export -f 2warchive && export -f 3dnsbuffer && export -f 4threatcrowd && export -f 5hackertarget && export -f 6certspotter && export -f 7anubisdb && export -f 8virustotal && export -f 9alienvault && export -f 10urlscan && export -f 11threatminer && export -f 12entrust && export -f 13riddler && export -f 14dnsdumpster && export -f 15findomain && export -f 16subfinder && export -f 17amass_passive && export -f 17amass_active && export -f 18assetfinder && export -f 19rapiddns && export -f 20subDomainsBrute
+			export -f 1crt && export -f 2warchive && export -f 3dnsbuffer && export -f 4threatcrowd && export -f 5hackertarget && export -f 6certspotter && export -f 7anubisdb && export -f 8virustotal && export -f 9alienvault && export -f 10urlscan && export -f 11threatminer && export -f 12entrust && export -f 13riddler && export -f 14dnsdumpster && export -f 15findomain && export -f 16subfinder && export -f 17amass_passive && export -f 17amass_active && export -f 18assetfinder && export -f 19rapiddns && export -f 20subDomainsBrute && export -f 21Sublist3r && export -f 22knock && export -f 23shuffledns && export -f 24theHarvester
 
-			parallel ::: 1crt 2warchive 3dnsbuffer 4threatcrowd 5hackertarget 6certspotter 7anubisdb 8virustotal 9alienvault 10urlscan 11threatminer 12entrust 13riddler 14dnsdumpster 15findomain 16subfinder 17amass_passive 17amass_active 18assetfinder 19rapiddns 20subDomainsBrute ::: $2	
+			parallel ::: 1crt 2warchive 3dnsbuffer 4threatcrowd 5hackertarget 6certspotter 7anubisdb 8virustotal 9alienvault 10urlscan 11threatminer 12entrust 13riddler 14dnsdumpster 15findomain 16subfinder 17amass_passive 17amass_active 18assetfinder 19rapiddns 20subDomainsBrute 21Sublist3r 22knock 24theHarvester ::: $2	
+			
+			# 单独执行 放在 parallel 中执行会错误，原因未知
+			23shuffledns $2
 
 			echo "———————————————————————— $2 SUBDOMAIN—————————————————————————————————"
-			cat crt_$2.txt warchive_$2.txt dnsbuffer_$2.txt threatcrowd_$2.txt hackertarget_$2.txt certspotter_$2.txt anubisdb_$2.txt virustotal_$2.txt alienvault_$2.txt urlscan_$2.txt threatminer_$2.txt entrust_$2.txt riddler_$2.txt dnsdumper_$2.txt findomain_$2.txt subfinder_$2.txt amass_passive_$2.txt amass_active_$2.txt assetfinder_$2.txt rapiddns_$2.txt subDomainsBrute_$2.txt | sort -u| grep -v "@" | egrep -v "//|:|,| |_|\|/"|grep -o "\w.*$2"|tee no_resolve_$2.txt
+			cat crt_$2.txt warchive_$2.txt dnsbuffer_$2.txt threatcrowd_$2.txt hackertarget_$2.txt certspotter_$2.txt anubisdb_$2.txt virustotal_$2.txt alienvault_$2.txt urlscan_$2.txt threatminer_$2.txt entrust_$2.txt riddler_$2.txt dnsdumper_$2.txt findomain_$2.txt subfinder_$2.txt amass_passive_$2.txt amass_active_$2.txt assetfinder_$2.txt rapiddns_$2.txt subDomainsBrute_$2.txt sublist3r_$2.txt knock_$2.txt shuffledns_$2.txt theHarvester_$2.txt | sort -u| grep -v "@" | egrep -v "//|:|,| |_|\|/"|grep -o "\w.*$2"|tee no_resolve_$2.txt
 
 			echo "- - - - - - - - - - - - - $2 ALIVE SUBDOMAIN - - - - - - - - - - - - -"
 			
-			rm crt_$2.txt warchive_$2.txt dnsbuffer_$2.txt threatcrowd_$2.txt hackertarget_$2.txt certspotter_$2.txt anubisdb_$2.txt virustotal_$2.txt alienvault_$2.txt urlscan_$2.txt threatminer_$2.txt entrust_$2.txt riddler_$2.txt dnsdumper_$2.txt findomain_$2.txt subfinder_$2.txt amass_passive_$2.txt amass_active_$2.txt assetfinder_$2.txt rapiddns_$2.txt subDomainsBrute_$2.txt
+			rm crt_$2.txt warchive_$2.txt dnsbuffer_$2.txt threatcrowd_$2.txt hackertarget_$2.txt certspotter_$2.txt anubisdb_$2.txt virustotal_$2.txt alienvault_$2.txt urlscan_$2.txt threatminer_$2.txt entrust_$2.txt riddler_$2.txt dnsdumper_$2.txt findomain_$2.txt subfinder_$2.txt amass_passive_$2.txt amass_active_$2.txt assetfinder_$2.txt rapiddns_$2.txt subDomainsBrute_$2.txt sublist3r_$2.txt knock_$2.txt shuffledns_$2.txt theHarvester_$2.txt
 
 			subsave $2
 			shift
