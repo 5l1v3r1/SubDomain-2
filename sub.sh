@@ -152,7 +152,10 @@ function 24theHarvester() {
 	path=`pwd`
 	cd subtools/theHarvester/
 	python3 theHarvester.py -d $1 -c -b all -f tmp_domain &>/dev/null
-	echo '</theHarvester>' >> tmp_domain.xml
+	xmllint --format tmp_domain.xml &>/dev/null
+	if [ $? -ne 0 ]; then
+		echo '</theHarvester>' >> tmp_domain.xml
+	fi
 	xmllint --xpath "//hostname/text()" tmp_domain.xml > theHarvester_$1.txt
 	cp theHarvester_$1.txt ${path}/
 	echo "[+] theHarvester Over => $(wc -l theHarvester_$1.txt|awk '{ print $1}')"
