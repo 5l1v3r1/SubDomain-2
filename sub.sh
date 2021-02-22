@@ -168,6 +168,11 @@ function commonToolInstall(){
 	#go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 	export GO111MODULE=on
 	export GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
+	# cannot download, $GOPATH not set.
+	# 解决，环境变量设置
+	# nano ~/.bashrc or nano ~/.zshrc
+	export GOPATH=$HOME/go
+	export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
 	if [ -e ~/go/bin/httprobe ] || [ -e /usr/local/bin/httprobe ] || [ -e ~/go-workspace/bin/httprobe ] || [ -e ~/gopath/bin/httprobe ] ; then
 		echo -e "${BLUE}[!] httprobe already exists ${RESET}"
