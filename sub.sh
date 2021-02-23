@@ -95,14 +95,26 @@ function 14dnsdumpster() {
 }
 function 15findomain() {
 	findomain -t $1 -u findomain_$1.txt &>/dev/null
+	if [ $? -ne 0 ]; then
+		echo 'eg: findomain执行错误!'
+		return
+	fi
 	echo "[+] Findomain Over => $(wc -l findomain_$1.txt | awk '{ print $1}')"
 }
 function 16subfinder() {
 	subfinder -config subtools/config/config.yaml -silent -d $1 -o subfinder_$1.txt &>/dev/null
+	if [ $? -ne 0 ]; then
+		echo 'eg: subfinder执行错误!'
+		return
+	fi
 	echo "[+] Subfinder Over => $(wc -l subfinder_$1.txt|awk '{ print $1}')"
 }
 function 17amass_passive() {
 	amass enum -passive -norecursive -noalts -d $1 -o amass_passive_$1.txt &>/dev/null
+	if [ $? -ne 0 ]; then
+		echo 'eg: amass_passive执行错误!'
+		return
+	fi
 	echo "[+] Amass Passive Over => $(wc -l amass_passive_$1.txt|awk '{ print $1}')"
 }
 function 17amass_active() {
@@ -112,6 +124,10 @@ function 17amass_active() {
 }
 function 18assetfinder() {
 	assetfinder --subs-only $1 > assetfinder_$1.txt
+	if [ $? -ne 0 ]; then
+		echo 'eg: assetfinder执行错误!'
+		return
+	fi
 	echo "[+] Assetfinder Over => $(wc -l  assetfinder_$1.txt|awk '{ print $1}')"
 }
 function 19rapiddns() {
@@ -121,7 +137,12 @@ function 19rapiddns() {
 function 20subDomainsBrute() {
 	path=`pwd`
 	cd subtools/subDomainsBrute/
-	python subDomainsBrute.py --full $1 -o tmp_$1.txt &>/dev/null
+	#python3 -m pip install aiodns &>/dev/null
+	python3 subDomainsBrute.py --full $1 -o tmp_$1.txt &>/dev/null
+	if [ $? -ne 0 ]; then
+		echo 'eg: subDomainsBrute执行错误!'
+		return
+	fi
 	cat tmp_$1.txt | awk '{ print $1}' > subDomainsBrute_$1.txt
 	rm -rf tmp_$1.txt
 	cp subDomainsBrute_$1.txt ${path}/
@@ -131,6 +152,10 @@ function 21Sublist3r() {
 	path=`pwd`
 	cd subtools/Sublist3r/
 	python3 sublist3r.py -t 100 -o sublist3r_$1.txt -d $1 &>/dev/null
+	if [ $? -ne 0 ]; then
+		echo 'eg: Sublist3r执行错误!'
+		return
+	fi
 	cp sublist3r_$1.txt ${path}/
 	echo "[+] Sublist3r Over => $(wc -l sublist3r_$1.txt|awk '{ print $1}')"
 }
@@ -140,18 +165,30 @@ function 22knock() {
 	# 清除之前的记录
 	rm -rf *.json
 	python knockpy/knockpy.py -j $1 &>/dev/null
+	if [ $? -ne 0 ]; then
+		echo 'eg: knock执行错误!'
+		return
+	fi
 	cat *.json | jq -r .found.subdomain[] > knock_$1.txt
 	cp knock_$1.txt ${path}/
 	echo "[+] knock Over => $(wc -l knock_$1.txt|awk '{ print $1}')"
 }
 function 23shuffledns() {
-	shuffledns -massdns massdns/bin/massdns -d $1 -w dict/subnames.txt -r dict/resolvers.txt -silent -o shuffledns_$1.txt &>/dev/null
+	shuffledns -massdns massdns/bin/massdns -d $1 -w subtools/dict/subnames.txt -r subtools/dict/resolvers.txt -silent -o shuffledns_$1.txt &>/dev/null
+	if [ $? -ne 0 ]; then
+		echo 'eg: shuffledns执行错误!'
+		return
+	fi
 	echo "[+] shuffledns Over => $(wc -l shuffledns_$1.txt|awk '{ print $1}')"
 }
 function 24theHarvester() {
 	path=`pwd`
 	cd subtools/theHarvester/
 	python3 theHarvester.py -d $1 -c -b all -f tmp_domain &>/dev/null
+	if [ $? -ne 0 ]; then
+		echo 'eg: theHarvester执行错误!'
+		return
+	fi
 	xmllint --format tmp_domain.xml &>/dev/null
 	if [ $? -ne 0 ]; then
 		echo '</theHarvester>' >> tmp_domain.xml
@@ -456,6 +493,8 @@ function installDebian(){ #Kali and Parrot Os
 	sudo apt install parallel -y;
 	sudo apt install golang -y;
 	sudo apt install git -y;
+	sudo apt install libxml2-utils -y
+	sudo apt-get install python-dnspython -y
 	echo -e "${GREEN}[!] Debian Tool Installed ${RESET}"
 	commonToolInstall;
 	echo -e "${GREEN}[!] Common Tool Installed ${RESET}"
@@ -504,6 +543,7 @@ function install(){
 	esac
 	echo "  "
 	echo "[+] Installation Complete jq,parallel,go,git,httprobe,subfinder,assetfinder,findomain,amass,shuffledns,massdns,subtools";
+	
 }
 #############################################################################################################
 function subsave(){
