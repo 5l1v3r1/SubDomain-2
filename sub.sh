@@ -200,8 +200,8 @@ function 24theHarvester() {
 #############################################################################################################
 function commonToolInstall(){
 	
-	result=$(go version | grep go1.6)
-	if [ "$result" ]; then
+	result=$(go version | grep go1.15.8)
+	if [ !"$result" ]; then
 		echo 'go版本过低，正在升级...'
 		#wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz -O /tmp/go1.15.8.linux-amd64.tar.gz
 		#替换自己github
@@ -493,7 +493,9 @@ function installDebian(){ #Kali and Parrot Os
 	sudo apt install parallel -y;
 	sudo apt install golang -y;
 	sudo apt install git -y;
+	# theHarvester 
 	sudo apt install libxml2-utils -y
+	# knock
 	sudo apt-get install python-dnspython -y
 	echo -e "${GREEN}[!] Debian Tool Installed ${RESET}"
 	commonToolInstall;
