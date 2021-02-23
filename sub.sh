@@ -11,6 +11,7 @@
 GREEN="\033[1;32m"
 BLUE="\033[1;36m"
 RED="\033[1;31m"
+YELLOW="\033[1;33m"
 RESET="\033[0m"
 
 
@@ -202,7 +203,7 @@ function commonToolInstall(){
 	
 	result=$(go version | grep go1.15.8)
 	if [ !"$result" ]; then
-		echo 'go版本过低，正在升级...'
+		echo -e "${YELLOW}go版本过低，正在升级...${RESET}"
 		#wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz -O /tmp/go1.15.8.linux-amd64.tar.gz
 		#替换自己github
 		wget https://github.com/r0ckysec/subtools/releases/latest/download/go1.15.8.linux-amd64.tar.gz -O /tmp/go1.15.8.linux-amd64.tar.gz
