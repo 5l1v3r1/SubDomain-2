@@ -163,6 +163,31 @@ function 24theHarvester() {
 #############################################################################################################
 function commonToolInstall(){
 	
+	result=$(go version | grep go1.6)
+	if [ "$result" ]; then
+		echo 'go版本过低，正在升级...'
+		#wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz -O /tmp/go1.15.8.linux-amd64.tar.gz
+		#替换自己github
+		wget https://github.com/r0ckysec/subtools/releases/latest/download/go1.15.8.linux-amd64.tar.gz -O /tmp/go1.15.8.linux-amd64.tar.gz
+		tar -zxf /tmp/go1.15.8.linux-amd64.tar.gz -C /usr/local/
+		rm -rf /tmp/go1.15.8.linux-amd64.tar.gz
+		ln -snf /usr/local/go /usr/lib/go
+		cp /usr/lib/go/bin/go /usr/bin/
+		echo "export GO111MODULE=on" >> ~/.bashrc
+		echo "export GOPROXY=https://mirrors.aliyun.com/goproxy/,direct" >> ~/.bashrc
+		echo "export GOROOT=/usr/local/go" >> ~/.bashrc
+		echo "export GOPATH=$HOME/go" >> ~/.bashrc
+		echo "export PATH=$PATH:$GOROOT/bin:$GOPATH/bin" >> ~/.bashrc
+		source ~/.bashrc
+		result=$(go version | grep go1.6)
+		if [ "$result" ]; then
+			echo 'go升级失败 -> '$result
+		else
+			echo 'go升级成功 -> '`go version`
+		fi
+	else
+		echo `go version`
+	fi
 	# 国内镜像加速    https://goproxy.cn,direct
 	#go env -w GO111MODULE=on
 	#go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
@@ -173,40 +198,83 @@ function commonToolInstall(){
 	# nano ~/.bashrc or nano ~/.zshrc
 	export GOPATH=$HOME/go
 	export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
-
+	# --------
+	# Install httprobe
 	if [ -e ~/go/bin/httprobe ] || [ -e /usr/local/bin/httprobe ] || [ -e ~/go-workspace/bin/httprobe ] || [ -e ~/gopath/bin/httprobe ] ; then
 		echo -e "${BLUE}[!] httprobe already exists ${RESET}"
 	else 
 		go get -u github.com/tomnomnom/httprobe
 		sudo mv ~/go/bin/httprobe /usr/local/bin/httprobe
 		sudo chmod +x /usr/local/bin/httprobe
+		if [ -e ~/go/bin/httprobe ] || [ -e /usr/local/bin/httprobe ] || [ -e ~/go-workspace/bin/httprobe ] || [ -e ~/gopath/bin/httprobe ] ; then
+			continue
+		else
+			echo -e "${RED}[!] httprobe go get failed ${RESET}"
+			#wget https://github.com/tomnomnom/httprobe/releases/download/v0.1.2/httprobe-linux-amd64-0.1.2.tgz -O /tmp/httprobe-linux-amd64-0.1.2.tgz
+			#替换自己github
+			wget https://github.com/r0ckysec/subtools/releases/latest/download/httprobe-linux-amd64-0.1.2.tgz -O /tmp/httprobe-linux-amd64-0.1.2.tgz
+			tar -zxf /tmp/httprobe-linux-amd64-0.1.2.tgz -C /usr/local/bin/
+			sudo chmod +x /usr/local/bin/httprobe
+			rm -rf /tmp/httprobe-linux-amd64-0.1.2.tgz
+		fi
 		# wget 方式
 		#wget https://github.com/tomnomnom/httprobe/releases/download/v0.1.2/httprobe-linux-amd64-0.1.2.tgz -O /tmp/httprobe-linux-amd64-0.1.2.tgz
 		#tar -zxf /tmp/httprobe-linux-amd64-0.1.2.tgz -C /usr/local/bin/
 		#sudo chmod +x /usr/local/bin/httprobe
 		#rm -rf /tmp/httprobe-linux-amd64-0.1.2.tgz
-		echo -e "${GREEN}[!] httprobe installed ${RESET}"
+		
+		if [ -e ~/go/bin/httprobe ] || [ -e /usr/local/bin/httprobe ] || [ -e ~/go-workspace/bin/httprobe ] || [ -e ~/gopath/bin/httprobe ] ; then
+			echo -e "${GREEN}[!] httprobe installed ${RESET}"
+		else
+			echo -e "${RED}[!] httprobe install failed ${RESET}"
+			exit -1
+		fi
 	fi
-
+	# --------
+	# Install subfinder
 	if [ -e ~/go/bin/subfinder ] || [ -e /usr/local/bin/subfinder ] || [ -e ~/go-workspace/bin/subfinder ] || [ -e ~/gopath/bin/subfinder ] ; then
 		echo -e "${BLUE}[!] Subfinder already exists ${RESET}"
 	else 
-		go get -u -v github.com/projectdiscovery/subfinder/cmd/subfinder
+		go get -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder
 		sudo mv ~/go/bin/subfinder /usr/local/bin/subfinder
 		sudo chmod +x /usr/local/bin/subfinder
-		echo -e "${GREEN}[!] Subfinder installed ${RESET}"
+		if [ -e ~/go/bin/subfinder ] || [ -e /usr/local/bin/subfinder ] || [ -e ~/go-workspace/bin/subfinder ] || [ -e ~/gopath/bin/subfinder ] ; then
+			continue
+		else
+			echo -e "[!] Subfinder go get failed"
+			#wget https://github.com/projectdiscovery/subfinder/releases/download/v2.4.6/subfinder_2.4.6_linux_amd64.tar.gz -O /tmp/subfinder_linux_amd64.tar.gz
+			#替换自己github
+			wget https://github.com/r0ckysec/subtools/releases/latest/download/subfinder_2.4.6_linux_amd64.tar.gz -O /tmp/subfinder_linux_amd64.tar.gz
+			tar -zxf /tmp/subfinder_linux_amd64.tar.gz -C /usr/local/bin/
+			sudo chmod +x /usr/local/bin/subfinder
+			rm -rf /tmp/subfinder_linux_amd64.tar.gz
+		fi
+		if [ -e ~/go/bin/subfinder ] || [ -e /usr/local/bin/subfinder ] || [ -e ~/go-workspace/bin/subfinder ] || [ -e ~/gopath/bin/subfinder ] ; then
+			echo -e "${GREEN}[!] Subfinder installed ${RESET}"
+		else
+			echo -e "${RED}[!] Subfinder install failed ${RESET}"
+			exit -1
+		fi
 	fi
-
+	# --------
+	# Install assetfinder
 	if [ -e ~/go/bin/assetfinder ] || [ -e /usr/local/bin/assetfinder ] || [ -e ~/go-workspace/bin/assetfinder ] || [ -e ~/gopath/bin/assetfinder ] ; then
 		echo -e "${BLUE}[!] Assetfinder already exists ${RESET}"
 	   
 	else 
-		go get -u github.com/tomnomnom/assetfinder
+		# go get -u github.com/tomnomnom/assetfinder
+		go get -u github.com/r0ckysec/assetfinder
 		sudo mv ~/go/bin/assetfinder /usr/local/bin/assetfinder
 		sudo chmod +x /usr/local/bin/assetfinder
-		echo -e "${GREEN}[!] Assetfinder installed ${RESET}"
+		if [ -e ~/go/bin/assetfinder ] || [ -e /usr/local/bin/assetfinder ] || [ -e ~/go-workspace/bin/assetfinder ] || [ -e ~/gopath/bin/assetfinder ] ; then
+			echo -e "${GREEN}[!] Assetfinder installed ${RESET}"
+		else
+			echo -e "${RED}[!] Assetfinder install failed ${RESET}"
+			exit -1
+		fi
 	fi
-
+	# --------
+	# Install findomain
 	if [ -e /usr/local/bin/findomain ] ; then
 	   
 		echo -e "${BLUE}[!] Findomain already exists ${RESET}"
@@ -214,18 +282,25 @@ function commonToolInstall(){
 	else 
 		case "$(uname -a)" in
 			*Debian*|*Ubuntu*|*Linux*|*Fedora*)
-			 	wget https://github.com/Edu4rdSHL/findomain/releases/latest/download/findomain-linux
+			 	#wget https://github.com/Edu4rdSHL/findomain/releases/latest/download/findomain-linux
+				#替换自己github
+				wget https://github.com/r0ckysec/subtools/releases/latest/download/findomain-linux
 				sudo chmod +x findomain-linux
 				sudo mv findomain-linux /usr/local/bin/findomain
-				echo -e "${GREEN}[!] Findomain installed ${RESET}"
 				;;
 			*)
 				echo "OS Not Linux";
 				;;
 		esac
-
+		if [ -e /usr/local/bin/findomain ] ; then
+			echo -e "${GREEN}[!] Findomain installed ${RESET}"
+		else
+			echo -e "${RED}[!] Findomain install failed ${RESET}"
+			exit -1
+		fi
 	fi
-
+	# --------
+	# Install amass
 	if [ -e /usr/bin/amass ] || [ -e /usr/local/bin/amass ] || [ -e ~/go/bin/amass ] ||  [ -e ~/go-workspace/bin/amass ] || [ -e ~/gopath/bin/amass ] ; then
 	   
 		echo -e "${BLUE}[!] Amass already exists ${RESET}"
@@ -234,12 +309,13 @@ function commonToolInstall(){
 		case "$(uname -a)" in
 			*Debian*|*Ubuntu*|*Linux*|*Fedora*)
 				
-				wget https://github.com/OWASP/Amass/releases/latest/download/amass_linux_amd64.zip -O /tmp/amass.zip
+				#wget https://github.com/OWASP/Amass/releases/latest/download/amass_linux_amd64.zip -O /tmp/amass.zip
+				#替换自己github
+				wget https://github.com/r0ckysec/subtools/releases/latest/download/amass_linux_amd64.zip -O /tmp/amass.zip
 				unzip /tmp/amass.zip -d /tmp/
 				sudo mv /tmp/amass_linux_amd64/amass /usr/local/bin/amass
 				sudo chmod +x /usr/local/bin/amass
-				rm -rf /tmp/amass_linux_amd64/ amass.zip
-				echo -e "${GREEN}[!] Amass installed ${RESET}"
+				rm -rf /tmp/amass_linux_amd64/ /tmp/amass.zip
 				#git clone https://github.com/OWASP/Amass.git
 				#go get -v -u github.com/OWASP/Amass/v3/...
 				;;
@@ -247,6 +323,12 @@ function commonToolInstall(){
 				echo "OS Not Fedora";
 				;;
 		esac
+		if [ -e /usr/bin/amass ] || [ -e /usr/local/bin/amass ] || [ -e ~/go/bin/amass ] ||  [ -e ~/go-workspace/bin/amass ] || [ -e ~/gopath/bin/amass ] ; then
+			echo -e "${GREEN}[!] Amass installed ${RESET}"
+		else
+			echo -e "${RED}[!] Amass install failed ${RESET}"
+			exit -1
+		fi
 	fi
 	# --------
 	# Install shuffledns
@@ -255,23 +337,45 @@ function commonToolInstall(){
 		echo -e "${BLUE}[!] Shuffledns already exists ${RESET}"
 	   
 	else 
-		go get -u -v github.com/projectdiscovery/shuffledns/cmd/shuffledns
+		go get -v github.com/projectdiscovery/shuffledns/cmd/shuffledns
 		# wget https://github.com/projectdiscovery/shuffledns/releases/latest/download/shuffledns_1.0.4_linux_amd64.tar.gz
 		# tar -xzvf shuffledns_1.0.4_linux_amd64.tar.gz -O /tmp/
 		sudo mv ~/go/bin/shuffledns /usr/local/bin/shuffledns
 		sudo chmod +x /usr/local/bin/shuffledns
-		echo -e "${GREEN}[!] Shuffledns installed ${RESET}"
+		if [ -e /usr/bin/shuffledns ] || [ -e /usr/local/bin/shuffledns ] || [ -e ~/go/bin/shuffledns ] ||  [ -e ~/go-workspace/bin/shuffledns ] || [ -e ~/gopath/bin/shuffledns ] ; then
+			echo -e "[!] Shuffledns go get failed"
+		else
+			#wget https://github.com/projectdiscovery/shuffledns/releases/download/v1.0.4/shuffledns_1.0.4_linux_amd64.tar.gz -O /tmp/shuffledns_1.0.4_linux_amd64.tar.gz
+			#替换自己github
+			wget https://github.com/r0ckysec/subtools/releases/latest/download/shuffledns_1.0.4_linux_amd64.tar.gz -O /tmp/shuffledns_1.0.4_linux_amd64.tar.gz
+			tar -zxf /tmp/shuffledns_1.0.4_linux_amd64.tar.gz -C /usr/local/bin/
+			sudo chmod +x /usr/local/bin/shuffledns
+			rm -rf /tmp/shuffledns_1.0.4_linux_amd64.tar.gz
+		fi
+		if [ -e /usr/bin/shuffledns ] || [ -e /usr/local/bin/shuffledns ] || [ -e ~/go/bin/shuffledns ] ||  [ -e ~/go-workspace/bin/shuffledns ] || [ -e ~/gopath/bin/shuffledns ] ; then
+			echo -e "${GREEN}[!] Shuffledns installed ${RESET}"
+		else
+			echo -e "${RED}[!] Shuffledns install failed ${RESET}"
+			exit -1
+		fi
 	fi
 	
 	# Install massdns
 	if [ -e massdns/bin/massdns ] ; then
 		echo -e "${BLUE}[!] Massdns already exists ${RESET}"
 	else 
-		git clone https://github.com/blechschmidt/massdns.git
+		# git clone https://github.com/blechschmidt/massdns.git
+		#替换自己github
+		git clone https://github.com/r0ckysec/massdns.git
 		cd massdns/
 		make
 		cd ..
-		echo -e "${GREEN}[!] Massdns installed ${RESET}"
+		if [ -e massdns/bin/massdns ] ; then
+			echo -e "${GREEN}[!] Massdns installed ${RESET}"
+		else
+			echo -e "${RED}[!] Massdns install failed ${RESET}"
+			exit -1
+		fi
 	fi
 	
 	# Install subtools
@@ -342,7 +446,6 @@ function commonToolInstall(){
 		echo -e "${RED}[!] Massdns not exists ${RESET}"
 		exit -1
 	fi
-
 }
 #############################################################################################################
 function installDebian(){ #Kali and Parrot Os
@@ -351,7 +454,7 @@ function installDebian(){ #Kali and Parrot Os
 	sudo apt install jq -y;
 	sudo apt install amass -y;
 	sudo apt install parallel -y;
-	sudo apt install golang-go -y;
+	sudo apt install golang -y;
 	sudo apt install git -y;
 	echo -e "${GREEN}[!] Debian Tool Installed ${RESET}"
 	commonToolInstall;
@@ -400,7 +503,7 @@ function install(){
 			;;
 	esac
 	echo "  "
-	echo "[+] Installation Complete jq,parallel,httprobe,amass,findomain,assetfinder";
+	echo "[+] Installation Complete jq,parallel,go,git,httprobe,subfinder,assetfinder,findomain,amass,shuffledns,massdns,subtools";
 }
 #############################################################################################################
 function subsave(){
