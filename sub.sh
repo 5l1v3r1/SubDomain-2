@@ -139,7 +139,7 @@ function 20subDomainsBrute() {
 	path=`pwd`
 	cd subtools/subDomainsBrute/
 	#python3 -m pip install aiodns &>/dev/null
-	python3 subDomainsBrute.py --full $1 -o tmp_$1.txt &>/dev/null
+	python3.7 subDomainsBrute.py --full $1 -o tmp_$1.txt &>/dev/null
 	if [ $? -ne 0 ]; then
 		echo 'eg: subDomainsBrute执行错误!'
 		return
@@ -152,7 +152,7 @@ function 20subDomainsBrute() {
 function 21Sublist3r() {
 	path=`pwd`
 	cd subtools/Sublist3r/
-	python3 sublist3r.py -t 100 -o sublist3r_$1.txt -d $1 &>/dev/null
+	python3.7 sublist3r.py -t 100 -o sublist3r_$1.txt -d $1 &>/dev/null
 	if [ $? -ne 0 ]; then
 		echo 'eg: Sublist3r执行错误!'
 		return
@@ -185,7 +185,7 @@ function 23shuffledns() {
 function 24theHarvester() {
 	path=`pwd`
 	cd subtools/theHarvester/
-	python3 theHarvester.py -d $1 -c -b all -f tmp_domain &>/dev/null
+	python3.7 theHarvester.py -d $1 -c -b all -f tmp_domain &>/dev/null
 	if [ $? -ne 0 ]; then
 		echo 'eg: theHarvester执行错误!'
 		return
@@ -198,6 +198,67 @@ function 24theHarvester() {
 	cp theHarvester_$1.txt ${path}/
 	echo "[+] theHarvester Over => $(wc -l theHarvester_$1.txt|awk '{ print $1}')"
 }
+function toolsTest() {
+	findomain -V
+	if [ $? -ne 0 ]; then
+		echo -e "${RED}[Fail] eg: findomain执行错误!${RESET}"
+		return
+	fi
+	echo -e "${GREEN}[OK] findomain is Available ${RESET}"
+	subfinder -version
+	if [ $? -ne 0 ]; then
+		echo -e "${RED}[Fail] eg: subfinder执行错误!${RESET}"
+		return
+	fi
+	echo -e "${GREEN}[OK] subfinder is Available ${RESET}"
+	amass -version
+	if [ $? -ne 0 ]; then
+		echo -e "${RED}[Fail] eg: amass_passive执行错误!${RESET}"
+		return
+	fi
+	echo -e "${GREEN}[OK] amass is Available ${RESET}"
+	assetfinder -h
+	if [ $? -ne 0 ]; then
+		echo -e "${RED}[Fail] eg: assetfinder执行错误!${RESET}"
+		return
+	fi
+	echo -e "${GREEN}[OK] assetfinder is Available ${RESET}"
+	python3.7 subtools/subDomainsBrute/subDomainsBrute.py --version
+	if [ $? -ne 0 ]; then
+		echo -e "${RED}[Fail] eg: subDomainsBrute执行错误!${RESET}"
+		return
+	fi
+	echo -e "${GREEN}[OK] subDomainsBrute is Available ${RESET}"
+	python3.7 subtools/Sublist3r/sublist3r.py
+	if [ $? -ne 0 ]; then
+		echo -e "${RED}[Fail] eg: Sublist3r执行错误!${RESET}"
+		return
+	fi
+	echo -e "${GREEN}[OK] Sublist3r is Available ${RESET}"
+	python subtools/knock-4.1/knockpy/knockpy.py -v
+	if [ $? -ne 0 ]; then
+		echo -e "${RED}[Fail] eg: knock执行错误!${RESET}"
+		return
+	fi
+	echo -e "${GREEN}[OK] knock is Available ${RESET}"
+	shuffledns -version
+	if [ $? -ne 0 ]; then
+		echo -e "${RED}[Fail] eg: shuffledns执行错误!${RESET}"
+		return
+	fi
+	echo -e "${GREEN}[OK] shuffledns is Available ${RESET}"
+	cd subtools/theHarvester
+	python3.7 theHarvester.py -h
+	if [ $? -ne 0 ]; then
+		echo -e "${RED}[Fail] eg: theHarvester执行错误!${RESET}"
+		return
+	fi
+	echo -e "${GREEN}[OK] theHarvester is Available ${RESET}"
+	cd ../../
+	echo "	"
+	echo -e "${GREEN}[+] Tools is Available ${RESET}"
+}
+
 #############################################################################################################
 function commonToolInstall(){
 	
@@ -486,6 +547,16 @@ function commonToolInstall(){
 		exit -1
 	fi
 }
+function moduleDependentInstall(){
+	# theHarvester 
+	sudo apt install libxml2-utils -y
+	# knock
+	sudo apt-get install python-dnspython -y
+	sudo apt install unzip -y
+	sudo apt install python3.7 -y
+	sudo apt install python3.7-dev -y
+	sudo python3.7 -m pip install -r subtools/requirements.txt
+}
 #############################################################################################################
 function installDebian(){ #Kali and Parrot Os
 	sudo apt-get update -y
@@ -495,14 +566,11 @@ function installDebian(){ #Kali and Parrot Os
 	sudo apt install parallel -y;
 	sudo apt install golang -y;
 	sudo apt install git -y;
-	# theHarvester 
-	sudo apt install libxml2-utils -y
-	# knock
-	sudo apt-get install python-dnspython -y
-	sudo apt install unzip -y
 	echo -e "${GREEN}[!] Debian Tool Installed ${RESET}"
 	commonToolInstall;
 	echo -e "${GREEN}[!] Common Tool Installed ${RESET}"
+	moduleDependentInstall;
+	echo -e "${GREEN}[!] Module Dependent Installed ${RESET}"
 	source ~/.bashrc ~/.zshrc;
 }
 function installOSX(){
@@ -606,10 +674,17 @@ args="${1}";
 			install
 			shift
 			;;
+			
+		-t|--test)
+			banner
+			toolsTest
+			shift
+			;;
 
 		-h|--help|*)
 			echo -e "Usage : "
 			echo -e "  -i | --install   sub.sh required tool install"
+			echo -e "  -t | --test      sub.sh required tool test"
 			echo -e "  -s | --small     Crt, Warchive, Dnsbuffer, Threatcrowd, Hackertarget, Certspotter, Abubis-DB, Virustotal,Alienvault, Urlscan, Threatminer, entrust, Riddler, Dnsdumpster Rapiddns"
 			echo -e "  -a | --all       Crt, Web-Archive, Dnsbuffer, Threatcrowd, Hackertarget, Certspotter, Anubisdb, Virustotal, Alienvault, Urlscan, Threatminer,  Entrust, Riddler, Dnsdumpster, Findomain, Subfinder, Amass, Assetfinder, Rapiddns"
 			echo -e "  bash sub.sh -s testfire.net"
