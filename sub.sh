@@ -202,7 +202,7 @@ function 24theHarvester() {
 function commonToolInstall(){
 	
 	result=$(go version | grep go1.15.8)
-	if [ !"$result" ]; then
+	if [ "$result" = "" ]; then
 		echo -e "${YELLOW}go版本过低，正在升级...${RESET}"
 		#wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz -O /tmp/go1.15.8.linux-amd64.tar.gz
 		#替换自己github
@@ -217,9 +217,10 @@ function commonToolInstall(){
 		echo "export GOPATH=$HOME/go" >> ~/.bashrc
 		echo "export PATH=$PATH:$GOROOT/bin:$GOPATH/bin" >> ~/.bashrc
 		source ~/.bashrc
-		result=$(go version | grep go1.6)
-		if [ "$result" ]; then
-			echo 'go升级失败 -> '$result
+		result=$(go version | grep go1.15.8)
+		if [ "$result" = "" ]; then
+			echo 'go升级失败 -> '`go version`
+			exit -1
 		else
 			echo 'go升级成功 -> '`go version`
 		fi
@@ -279,7 +280,7 @@ function commonToolInstall(){
 		if [ -e ~/go/bin/subfinder ] || [ -e /usr/local/bin/subfinder ] || [ -e ~/go-workspace/bin/subfinder ] || [ -e ~/gopath/bin/subfinder ] ; then
 			continue
 		else
-			echo -e "[!] Subfinder go get failed"
+			echo -e "${RED}[!] Subfinder go get failed${RESET}"
 			#wget https://github.com/projectdiscovery/subfinder/releases/download/v2.4.6/subfinder_2.4.6_linux_amd64.tar.gz -O /tmp/subfinder_linux_amd64.tar.gz
 			#替换自己github
 			wget https://github.com/r0ckysec/subtools/releases/latest/download/subfinder_2.4.6_linux_amd64.tar.gz -O /tmp/subfinder_linux_amd64.tar.gz
@@ -498,6 +499,7 @@ function installDebian(){ #Kali and Parrot Os
 	sudo apt install libxml2-utils -y
 	# knock
 	sudo apt-get install python-dnspython -y
+	sudo apt install unzip -y
 	echo -e "${GREEN}[!] Debian Tool Installed ${RESET}"
 	commonToolInstall;
 	echo -e "${GREEN}[!] Common Tool Installed ${RESET}"
