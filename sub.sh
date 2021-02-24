@@ -166,11 +166,11 @@ function 22knock() {
 	# 清除之前的记录
 	rm -rf *.json
 	python knockpy/knockpy.py -j $1 &>/dev/null
+	cat *.json | jq -r .found.subdomain[] > knock_$1.txt
 	if [ $? -ne 0 ]; then
 		echo 'eg: knock执行错误!'
 		return
 	fi
-	cat *.json | jq -r .found.subdomain[] > knock_$1.txt
 	cp knock_$1.txt ${path}/
 	echo "[+] knock Over => $(wc -l knock_$1.txt|awk '{ print $1}')"
 }
@@ -553,9 +553,11 @@ function moduleDependentInstall(){
 	# knock
 	sudo apt-get install python-dnspython -y
 	sudo apt install unzip -y
+	sudo apt install python-pip -y
 	sudo apt install python3.7 -y
 	sudo apt install python3.7-dev -y
 	sudo python3.7 -m pip install -r subtools/requirements.txt
+	sudo python -m pip install dnspython==1.16.0
 }
 #############################################################################################################
 function installDebian(){ #Kali and Parrot Os
