@@ -194,7 +194,8 @@ function 24theHarvester() {
 	if [ $? -ne 0 ]; then
 		echo '</theHarvester>' >> tmp_domain.xml
 	fi
-	xmllint --xpath "//hostname/text()" tmp_domain.xml > theHarvester_$1.txt
+	# xmllint --xpath "//hostname/text()" tmp_domain.xml > theHarvester_$1.txt
+	xpath -q -e "//hostname/text()" tmp_domain.xml > theHarvester_$1.txt
 	cp theHarvester_$1.txt ${path}/
 	echo "[+] theHarvester Over => $(wc -l theHarvester_$1.txt|awk '{ print $1}')"
 }
@@ -556,6 +557,7 @@ function moduleDependentInstall(){
 	sudo apt install python-pip -y
 	sudo apt install python3.7 -y
 	sudo apt install python3.7-dev -y
+	sudo apt install libxml-xpath-perl -y
 	sudo python3.7 -m pip install -r subtools/requirements.txt
 	sudo python -m pip install dnspython==1.16.0
 }
