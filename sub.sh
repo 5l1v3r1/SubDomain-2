@@ -139,7 +139,7 @@ function 20subDomainsBrute() {
 	path=`pwd`
 	cd subtools/subDomainsBrute/
 	#python3 -m pip install aiodns &>/dev/null
-	python3.7 subDomainsBrute.py --full $1 -o tmp_$1.txt &>/dev/null
+	python3.7 subDomainsBrute.py --full $1 -w -o tmp_$1.txt &>/dev/null
 	if [ $? -ne 0 ]; then
 		echo 'eg: subDomainsBrute执行错误!'
 		return
@@ -278,7 +278,6 @@ function commonToolInstall(){
 		echo "export GOROOT=/usr/local/go" >> ~/.bashrc
 		echo "export GOPATH=$HOME/go" >> ~/.bashrc
 		echo "export PATH=$PATH:$GOROOT/bin:$GOPATH/bin" >> ~/.bashrc
-		source ~/.bashrc
 		result=$(go version | grep go1.15.8)
 		if [ "$result" = "" ]; then
 			echo 'go升级失败 -> '`go version`
@@ -289,14 +288,20 @@ function commonToolInstall(){
 	else
 		echo `go version`
 	fi
+	source ~/.bashrc
 	# 国内镜像加速    https://goproxy.cn,direct
 	#go env -w GO111MODULE=on
 	#go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
-	export GO111MODULE=on
-	export GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
+	# export GO111MODULE=on
+	# export GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 	# cannot download, $GOPATH not set.
 	# 解决，环境变量设置
 	# nano ~/.bashrc or nano ~/.zshrc
+	# export GOPATH=$HOME/go
+	# export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+	export GO111MODULE=on
+	export GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
+	export GOROOT=/usr/local/go
 	export GOPATH=$HOME/go
 	export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 	# --------
@@ -557,7 +562,10 @@ function moduleDependentInstall(){
 	sudo apt install python-pip -y
 	sudo apt install python3.7 -y
 	sudo apt install python3.7-dev -y
+	sudo apt install python3-pip -y
 	sudo apt install libxml-xpath-perl -y
+}
+function pythonPIPInstall(){
 	sudo python3.7 -m pip install -r subtools/requirements.txt
 	sudo python -m pip install dnspython==1.16.0
 }
@@ -571,10 +579,12 @@ function installDebian(){ #Kali and Parrot Os
 	sudo apt install golang -y;
 	sudo apt install git -y;
 	echo -e "${GREEN}[!] Debian Tool Installed ${RESET}"
-	commonToolInstall;
-	echo -e "${GREEN}[!] Common Tool Installed ${RESET}"
 	moduleDependentInstall;
 	echo -e "${GREEN}[!] Module Dependent Installed ${RESET}"
+	commonToolInstall;
+	echo -e "${GREEN}[!] Common Tool Installed ${RESET}"
+	pythonPIPInstall;
+	echo -e "${GREEN}[!] Python Pip Installed ${RESET}"
 	source ~/.bashrc ~/.zshrc;
 }
 function installOSX(){
@@ -620,6 +630,39 @@ function install(){
 	esac
 	echo "  "
 	echo "[+] Installation Complete jq,parallel,go,git,httprobe,subfinder,assetfinder,findomain,amass,shuffledns,massdns,subtools";
+	
+}
+
+function uninstallDebian(){
+	path=`pwd`
+	rm -rf  ~/go | echo -e "[${GREEN}OK${RESET}] go deleted."
+	rm -rf  ${path}/subtools | echo -e "[${GREEN}OK${RESET}] subtools deleted."
+	rm -rf /usr/local/bin/httprobe | echo -e "[${GREEN}OK${RESET}] httprobe deleted."
+	rm -rf /usr/local/bin/subfinder | echo -e "[${GREEN}OK${RESET}] subfinder deleted."
+	rm -rf /usr/local/bin/assetfinder | echo -e "[${GREEN}OK${RESET}] assetfinder deleted."
+	rm -rf /usr/local/bin/findomain | echo -e "[${GREEN}OK${RESET}] findomain deleted."
+	rm -rf /usr/local/bin/amass | echo -e "[${GREEN}OK${RESET}] amass deleted."
+	rm -rf /usr/local/bin/shuffledns | echo -e "[${GREEN}OK${RESET}] shuffledns deleted."
+	rm -rf ${path}/massdns | echo -e "[${GREEN}OK${RESET}] massdns deleted."
+}
+
+function uninstall(){
+	case "$(uname -a)" in
+		*Debian*|*Ubuntu*|*Linux*)
+			uninstallDebian;
+			;;
+		# *Fedora*)
+		# 	uninstallFedora;
+		# 	;;
+		# *Darwin*)
+		# 	uninstallOSX;
+		# 	;;
+		*)
+			echo "Unable to detect an operating system that is compatible with Sub.sh...";
+			;;
+	esac
+	echo "  "
+	echo "[+] tools deleted.";
 	
 }
 #############################################################################################################
@@ -678,6 +721,11 @@ args="${1}";
 			install
 			shift
 			;;
+
+		--remove)
+			uninstall
+			shift
+			;;
 			
 		-t|--test)
 			banner
@@ -691,6 +739,7 @@ args="${1}";
 			echo -e "  -t | --test      sub.sh required tool test"
 			echo -e "  -s | --small     Crt, Warchive, Dnsbuffer, Threatcrowd, Hackertarget, Certspotter, Abubis-DB, Virustotal,Alienvault, Urlscan, Threatminer, entrust, Riddler, Dnsdumpster Rapiddns"
 			echo -e "  -a | --all       Crt, Web-Archive, Dnsbuffer, Threatcrowd, Hackertarget, Certspotter, Anubisdb, Virustotal, Alienvault, Urlscan, Threatminer,  Entrust, Riddler, Dnsdumpster, Findomain, Subfinder, Amass, Assetfinder, Rapiddns"
+			echo -e "  --remove   sub.sh required tool uninstall"
 			echo -e "  bash sub.sh -s testfire.net"
 			echo -e "  bash sub.sh -a testfire.net"
 			echo -e "  curl -sL https://git.io/JesKK | bash /dev/stdin -s webscantest.com"
