@@ -1,12 +1,12 @@
-# 🎯🕸📘 Multiprocessing(Parallel)Subdomain Detect Script [![CMD](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
+# 强大的子域名收集工具整合
 
-## ✨ 🔺Sub.sh but without API key 🔻
+## Sub.sh but without API key 
 
-## https://github.com/cihanmehmet/sub.sh
+### 对[原项目](https://github.com/cihanmehmet/sub.sh)进行加强和Bug调整
 
-## ‼️ [jq](https://stedolan.github.io/jq/download/) , [httprobe](https://github.com/tomnomnom/httprobe) and [parallel](https://www.gnu.org/software/parallel/parallel_tutorial.html) required 📌
+### ‼️ [jq](https://stedolan.github.io/jq/download/) , [httprobe](https://github.com/tomnomnom/httprobe) and [parallel](https://www.gnu.org/software/parallel/parallel_tutorial.html) required 📌
 
-## 📘 ✅ Used Services 
+## Used Services 
 ```diff
 + https://crt.sh
 + http://web.archive.org
@@ -23,12 +23,11 @@
 + https://riddler.io
 + https://dnsdumpster.com
 + https://rapiddns.io
-[-] Removed service
-- https://suip.biz (Amass,Subfinder,Findomain)
 # 🔨 Used Passive Scan Tool
 + Findomain
 + Subfinder
 + Assetfinder
++ ...
 ```
 ## 💢 USAGE 💡
 ### Script Usage 🎯
@@ -44,7 +43,7 @@ curl -sL https://git.io/JesKK | bash /dev/stdin -s webscantest.com
 ```powershell
 ./sub.sh -a webscantest.com
 ```
-![image](https://i.imgur.com/FuIh0wQ.png)
+
 
 ##  🔸 Required tool automatic install
 ```powershell
@@ -66,32 +65,9 @@ go get -u github.com/projectdiscovery/subfinder/cmd/subfinder
 go get -u github.com/tomnomnom/assetfinder
 go get -v -u github.com/OWASP/Amass/v3/...
 ```
-## Demo
-Use this link to test Sub.sh directly in your browser:
-###
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/cihanmehmet/sub.sh&tutorial=README.md)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-## 🔑 📜 Subdomain Detect Terminal Shortcut Function
-### nano ~/.zshrc
-or
-### nano ~/.bashrc
-
-```powershell
-function subdomain() { curl -sL https://git.io/JesKK | bash /dev/stdin "$1" "$2" }
-```
-## 💡 Usage
-```powershell
-subdomain webscantest.com
-```
-![image](https://i.imgur.com/L2sufiT.png)
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
-## :triangular_flag_on_post: 💻 I am open to suggestions for improvement.
 
 ## Twitter:
-<p align="center"><a href="https://twitter.com/cihanmehmets" target="_blank"><img src="https://img.shields.io/twitter/follow/cihanmehmets.svg?logo=twitter"></a></p>
+<p align="center"><a href="https://twitter.com/r0cky6861636b" target="_blank"><img src="https://img.shields.io/twitter/follow/r0cky6861636b.svg?logo=twitter"></a></p>
+
+## References
+https://github.com/cihanmehmet/sub.sh
