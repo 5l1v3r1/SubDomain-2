@@ -27,6 +27,8 @@
 + Findomain
 + Subfinder
 + Assetfinder
++ subDomainsBrute
++ Sublist3r
 + ...
 ```
 ## 💢 USAGE 💡
@@ -67,7 +69,7 @@ go get -v -u github.com/OWASP/Amass/v3/...
 ```
 
 ## Twitter:
-<p align="center"><a href="https://twitter.com/r0cky6861636b" target="_blank"><img src="https://img.shields.io/twitter/follow/r0cky6861636b.svg?logo=twitter"></a></p>
+<p align="left"><a href="https://twitter.com/r0cky6861636b" target="_blank"><img src="https://img.shields.io/twitter/follow/r0cky6861636b.svg?logo=twitter"></a></p>
 
 ## References
 https://github.com/cihanmehmet/sub.sh
